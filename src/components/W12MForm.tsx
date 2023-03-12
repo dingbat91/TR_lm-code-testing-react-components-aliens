@@ -1,5 +1,6 @@
 import { useState } from "react";
 import BeingsInput from "./form/Beings";
+import FormError from "./form/error/FormError";
 import MathsInput from "./form/Maths";
 import { PlanetInput } from "./form/Planet";
 import SparingInput from "./form/Sparing";
@@ -48,7 +49,7 @@ const W12MForm = () => {
 				}
 			case "Being":
 				const numVal = +value;
-				if (numVal >= 1000000) {
+				if (numVal >= 1000000 && /[^0-9]/i.test(value) === false) {
 					setBeingValid(true);
 					break;
 				} else {
@@ -72,6 +73,27 @@ const W12MForm = () => {
 		}
 	};
 
+	const findCulprit = (): Array<String> => {
+		let output: Array<String> = [];
+
+		if (!speciesValid) {
+			output.push("Species");
+		}
+		if (!planetValid) {
+			output.push("Planet");
+		}
+		if (!beingValid) {
+			output.push("Beings");
+		}
+		if (!mathsValid) {
+			output.push("Maths");
+		}
+		if (!reasonValid) {
+			output.push("Reason");
+		}
+		return output;
+	};
+
 	return (
 		<section className='w12MForm'>
 			<W12MHeader />
@@ -82,6 +104,8 @@ const W12MForm = () => {
 					setspeciesState(e.target.value);
 				}}
 			/>
+			{speciesValid !== true && <FormError Erroritem='Species' />}
+
 			<PlanetInput
 				planetName={planetState}
 				onChangePlanetName={(e: any) => {
@@ -89,6 +113,8 @@ const W12MForm = () => {
 					setPlanetState(e.target.value);
 				}}
 			/>
+			{planetValid !== true && <FormError Erroritem='Planet' />}
+
 			<BeingsInput
 				beingsCount={beingsState}
 				onChangeBeingsCount={(e: any) => {
@@ -96,6 +122,8 @@ const W12MForm = () => {
 					setBeingsState(e.target.value);
 				}}
 			/>
+			{beingValid !== true && <FormError Erroritem='Being' />}
+
 			<MathsInput
 				Mathvalue={mathState}
 				onselectMathValue={(e: any) => {
@@ -103,6 +131,8 @@ const W12MForm = () => {
 					setMathState(e.target.value);
 				}}
 			/>
+			{mathsValid !== true && <FormError Erroritem='Math' />}
+
 			<SparingInput
 				SparingReason={reasonState}
 				onChangeSparingreason={(e: any) => {
@@ -110,6 +140,8 @@ const W12MForm = () => {
 					setReasonState(e.target.value);
 				}}
 			/>
+			{reasonValid !== true && <FormError Erroritem='Reason' />}
+
 			<button
 				id='Button'
 				onClick={(e: any) => {
@@ -121,9 +153,15 @@ const W12MForm = () => {
 						reasonValid,
 					].every((val) => val === true);
 					if (valid) {
-						console.log("Yipee!");
+						console.log("WE SAVED EARTH!");
 					} else {
 						console.log("Oh no!");
+						const error = findCulprit();
+						console.error(
+							`Form has failed validation in the following categories: ${[
+								...error,
+							]}`
+						);
 					}
 				}}
 			>
